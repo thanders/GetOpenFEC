@@ -28,10 +28,7 @@ import static org.junit.Assert.assertTrue;
 @SpringBootTest(classes = RestclientApplication.class)
 @WebAppConfiguration
 @ActiveProfiles("local")
-@TestPropertySource(properties = {
-        "amazon.dynamodb.endpoint=http://localhost:8000/",
-        "amazon.aws.accesskey=AKIA4ZUEGPC7YPFX7XGQ",
-        "amazon.aws.secretkey=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" })
+
 public class DatabasePersistenceTest {
 
     private DynamoDBMapper dynamoDBMapper;
