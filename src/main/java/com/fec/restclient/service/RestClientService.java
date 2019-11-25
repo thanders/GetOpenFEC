@@ -1,10 +1,13 @@
 package com.fec.restclient.service;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.model.DescribeTableResult;
+import com.amazonaws.services.dynamodbv2.xspec.S;
 import com.fec.restclient.bean.Candidate;
 import com.fec.restclient.bean.ResponseObj;
 import com.fec.restclient.repository.CandidateRepository;
+import org.socialsignin.spring.data.dynamodb.repository.EnableScan;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import org.springframework.beans.factory.annotation.Value;
@@ -19,7 +22,6 @@ import reactor.core.publisher.Mono;
 import java.util.Collections;
 import java.util.List;
 
-
 @Service
 public class RestClientService {
 
@@ -28,12 +30,20 @@ public class RestClientService {
     @Autowired
     private CandidateRepository repository;
 
+    @Autowired
+    private DataProcessService dataProcessService;
+
+    private DynamoDBMapper dynamoDBMapper;
+
+    @Autowired
+    private AmazonDynamoDB amazonDynamoDB;
+
     @Value("${openfec}")
     private String testKey;
 
+    List<Candidate> candidates;
 
     public WebClient.RequestBodySpec createRequest(){
-
 
         WebClient requestClient = WebClient
                 .builder()
@@ -43,7 +53,6 @@ public class RestClientService {
                 .defaultUriVariables(Collections.singletonMap("url", "http://localhost:8080"))
                 .build();
 
-        System.out.println("YOUR API KEY: "+ this.key);
         WebClient.RequestBodySpec request = requestClient
                 .method(HttpMethod.GET)
                 .uri(uriBuilder -> uriBuilder
@@ -70,23 +79,6 @@ public class RestClientService {
         Mono<ResponseObj> candidateFlux = request.retrieve().bodyToMono(ResponseObj.class).log();
 
         return candidateFlux;
-    }
-
-    public void handleResponse(ResponseObj responseObj) {
-
-        System.out.println("handle response");
-        List<Candidate> ts = responseObj.getResults();
-
-        /*
-        for (Candidate t : ts){
-
-            System.out.println(t.getName() + "\n" + t.getParty_full() +"\n" + t.getOffice_full() +"\n" );
-        }
-*/
-        System.out.println(ts.get(0).getCandidate_id());
-        System.out.println(ts.get(0).getClass());
-
-        //this.repository.save(ts.get(0));
     }
 
     public void setKey(String key) {

@@ -12,6 +12,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import com.fec.restclient.bean.CandidateTest;
 import com.fec.restclient.repository.CandidateRepository;
 import com.fec.restclient.repository.CandidateTestRepository;
+import com.fec.restclient.service.DataProcessService;
 import org.socialsignin.spring.data.dynamodb.repository.config.EnableDynamoDBRepositories;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -20,7 +21,7 @@ import org.springframework.context.annotation.PropertySource;
 
 @Configuration
 @PropertySource("classpath:application.properties")
-@EnableDynamoDBRepositories(basePackageClasses = {CandidateRepository.class, CandidateTestRepository.class})
+@EnableDynamoDBRepositories(basePackageClasses = {CandidateRepository.class, CandidateTestRepository.class, DataProcessService.class})
 public class DynamoDBConfig {
 
     @Value("${amazon.aws.accesskey}")
@@ -35,6 +36,8 @@ public class DynamoDBConfig {
 
     @Bean
     public AWSCredentials amazonAWSCredentials() {
+        System.out.println(this.amazonAWSAccessKey);
+        System.out.println(this.amazonAWSSecretKey);
         return new BasicAWSCredentials(amazonAWSAccessKey, amazonAWSSecretKey);
     }
 

@@ -6,8 +6,10 @@ import org.springframework.data.repository.CrudRepository;
 
 import java.util.List;
 
+
 @EnableScan
 public interface CandidateRepository extends CrudRepository<Candidate, String> {
     List<Candidate> findCandidateByID(String candidate_id);
     List<Candidate> findByParty(String party);
+
 }

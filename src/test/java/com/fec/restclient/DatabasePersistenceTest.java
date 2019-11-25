@@ -28,7 +28,10 @@ import static org.junit.Assert.assertTrue;
 @SpringBootTest(classes = RestclientApplication.class)
 @WebAppConfiguration
 @ActiveProfiles("local")
-
+@TestPropertySource(properties = {
+        "amazon.dynamodb.endpoint=http://localhost:8000/",
+        "amazon.aws.accesskey=",
+        "amazon.aws.secretkey=" })
 public class DatabasePersistenceTest {
 
     private DynamoDBMapper dynamoDBMapper;
@@ -58,7 +61,7 @@ public class DatabasePersistenceTest {
         tableRequest.setProvisionedThroughput(new ProvisionedThroughput(1L, 1L));
 
         // request a description of the table to see if it exists
-        Boolean exists = dataProcessService.tableExists(amazonDynamoDB, tablename);
+        Boolean exists = dataProcessService.tableExists();
 
         // If it exists
         if (exists == true){
@@ -89,7 +92,6 @@ public class DatabasePersistenceTest {
     public void SaveCandidateTestCase() {
         Candidate can = new Candidate();
         can.setCandidate_id("200");
-        String cid = can.getCandidate_id();
 
         repository.save(can);
 
