@@ -1,16 +1,9 @@
 package com.fec.restclient.service;
 
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.amazonaws.services.dynamodbv2.model.DescribeTableResult;
-import com.amazonaws.services.dynamodbv2.xspec.S;
 import com.fec.restclient.bean.Candidate;
 import com.fec.restclient.bean.ResponseObj;
-import com.fec.restclient.repository.CandidateRepository;
-import org.socialsignin.spring.data.dynamodb.repository.EnableScan;
-import org.springframework.beans.factory.annotation.Autowired;
-
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
@@ -23,23 +16,11 @@ import java.util.Collections;
 import java.util.List;
 
 @Service
+@Configuration
 public class RestClientService {
 
-   private String key;
-
-    @Autowired
-    private CandidateRepository repository;
-
-    @Autowired
-    private DataProcessService dataProcessService;
-
-    private DynamoDBMapper dynamoDBMapper;
-
-    @Autowired
-    private AmazonDynamoDB amazonDynamoDB;
-
     @Value("${openfec}")
-    private String testKey;
+    private String apiKey;
 
     List<Candidate> candidates;
 
@@ -53,6 +34,7 @@ public class RestClientService {
                 .defaultUriVariables(Collections.singletonMap("url", "http://localhost:8080"))
                 .build();
 
+        System.out.println("your API Key   " + apiKey);
         WebClient.RequestBodySpec request = requestClient
                 .method(HttpMethod.GET)
                 .uri(uriBuilder -> uriBuilder
@@ -67,7 +49,7 @@ public class RestClientService {
                         .queryParam("election_year", "2020")
                         .queryParam("candidate_status", "C")
                         .queryParam("office", "P")
-                        .queryParam("api_key", this.key)
+                        .queryParam("api_key", this.apiKey)
                         .build());
 
         return request;
@@ -76,20 +58,12 @@ public class RestClientService {
 
     public Mono<ResponseObj> sendRequest(WebClient.RequestBodySpec request){
 
-        Mono<ResponseObj> candidateFlux = request.retrieve().bodyToMono(ResponseObj.class).log();
+        Mono<ResponseObj> candidateMono = request.retrieve().bodyToMono(ResponseObj.class).log();
 
-        return candidateFlux;
+        return candidateMono;
     }
 
-    public void setKey(String key) {
-        this.key = key;
-    }
-
-    public boolean tableExists(AmazonDynamoDB amazonDynamoDB, String tableName){
-
-
-        DescribeTableResult json = amazonDynamoDB.describeTable(tableName);
-
-        return true;
+    public void setApiKey(String apiKey) {
+        this.apiKey = apiKey;
     }
 }

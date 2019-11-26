@@ -12,10 +12,7 @@ import com.fec.restclient.bean.Candidate;
 import com.fec.restclient.repository.CandidateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
-
 import static java.lang.Thread.sleep;
-
 
 @Service
 public class DataProcessService {
@@ -32,7 +29,7 @@ public class DataProcessService {
 
     Class<Candidate> tableName;
 
-    public void connect(){
+    public void connectToDB(){
         this.amazonDynamoDB = AmazonDynamoDBClientBuilder.standard()
                 .withRegion(Regions.US_EAST_1)
                 .build();
@@ -41,11 +38,18 @@ public class DataProcessService {
     }
 
     public void instantiateMapper(){
-
+;
         // Create instance of DynamoDBmapper
         this.dynamoDBMapper = new DynamoDBMapper(amazonDynamoDB);
+
+    }
+
+    public void createTableRequest(Object tableClass){
+
+        System.out.println(tableClass.getClass());
+
         // Create a request for a new table based on the candidate class
-        this.tableRequest = dynamoDBMapper.generateCreateTableRequest(Candidate.class);
+        this.tableRequest = dynamoDBMapper.generateCreateTableRequest(tableClass.getClass());
         // Add provisioned throughput - required
         this.tableRequest.setProvisionedThroughput(new ProvisionedThroughput(1L, 1L));
 
@@ -53,6 +57,7 @@ public class DataProcessService {
 
     public boolean createTable() throws InterruptedException {
 
+        // Check if it already exists
         Boolean exists = this.tableExists();
 
         // If it exists
@@ -104,6 +109,8 @@ public class DataProcessService {
     public AmazonDynamoDB getAmazonDynamoDB() {
         return amazonDynamoDB;
     }
+
+
 }
 
 
