@@ -9,7 +9,7 @@
         <relativePath/> <!-- lookup parent from repository -->
     </parent>
     <groupId>com.fec</groupId>
-    <artifactId>opencecRestClient</artifactId>
+    <artifactId>openfecrestclient</artifactId>
     <version>0.1</version>
     <name>restclient</name>
     <description>A tool for using the open FEC rest service</description>
