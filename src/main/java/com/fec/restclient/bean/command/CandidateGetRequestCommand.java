@@ -1,31 +1,34 @@
-package com.fec.restclient.service;
+package com.fec.restclient.bean.command;
+
+/*
+ * Concrete command to create file
+ */
 
 import com.fec.restclient.bean.Candidate;
 import com.fec.restclient.bean.ResponseObj;
+import com.fec.restclient.service.DataProcessService;
+import com.fec.restclient.service.RestClientService;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.stereotype.Service;
+import org.springframework.stereotype.Component;
 import org.springframework.web.reactive.function.client.WebClient;
 import reactor.core.publisher.Mono;
 
-@Service
-public class UserInputService {
-
-    @Autowired
-    DataProcessService dataProcessService;
+@Component
+public class CandidateGetRequestCommand implements Command{
 
     @Autowired
     RestClientService restClientService;
 
     @Autowired
+    DataProcessService dataProcessService;
+
+    @Autowired
     Candidate candidate;
 
-    public void establishDynamoDBConnection() {
+    public Iterable<Candidate> executeCandidateGetRequest() {
 
         dataProcessService.setTableName(Candidate.class);
         dataProcessService.connectToDB();
-    }
-
-    public void createTable() {
 
         dataProcessService.instantiateMapper();
         // Create a DynamoDB table creation request for the desired object type
@@ -36,9 +39,6 @@ public class UserInputService {
         } catch (InterruptedException e) {
             e.printStackTrace();
         }
-    }
-
-    public Iterable<Candidate> getCandidates() {
 
         // create the Webclient request object
         WebClient.RequestBodySpec reqObj = restClientService.createRequest();
@@ -54,9 +54,8 @@ public class UserInputService {
         return candidates;
     }
 
-    public void setApiKey(String apiKey){
+    @Override
+    public void execute() {
 
-        restClientService.setApiKey(apiKey);
     }
-
 }

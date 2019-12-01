@@ -66,4 +66,8 @@ public class RestClientService {
     public void setApiKey(String apiKey) {
         this.apiKey = apiKey;
     }
+
+    public String getApiKey(){
+        return this.apiKey;
+    }
 }
