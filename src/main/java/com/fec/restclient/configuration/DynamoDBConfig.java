@@ -47,4 +47,12 @@ public class DynamoDBConfig {
         return AmazonDynamoDBClientBuilder.standard().withCredentials(amazonAWSCredentialsProvider())
                 .withRegion(Regions.US_EAST_1).build();
     }
+
+    public void setAmazonAWSAccessKey(String amazonAWSAccessKey) {
+        this.amazonAWSAccessKey = amazonAWSAccessKey;
+    }
+
+    public void setAmazonAWSSecretKey(String amazonAWSSecretKey) {
+        this.amazonAWSSecretKey = amazonAWSSecretKey;
+    }
 }

@@ -42,6 +42,7 @@ public class DataProcessService {
         // Create instance of DynamoDBmapper
         this.dynamoDBMapper = new DynamoDBMapper(amazonDynamoDB);
 
+
     }
 
     public void createTableRequest(Object tableClass){

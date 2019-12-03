@@ -5,6 +5,7 @@ import com.fec.restclient.bean.Candidate;
 import com.fec.restclient.bean.command.CandidateDBSave;
 import com.fec.restclient.bean.command.CandidateGetRequestCommand;
 import com.fec.restclient.bean.command.Command;
+import com.fec.restclient.configuration.DynamoDBConfig;
 import com.fec.restclient.service.DataProcessService;
 import com.fec.restclient.service.RestClientService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -40,6 +41,9 @@ public class Menu{
     @Autowired
     DataProcessService dataProcessService;
 
+    @Autowired
+    DynamoDBConfig dynamoDBConfig;
+
     Iterable<Candidate> candidates;
 
 
@@ -63,11 +67,14 @@ public class Menu{
 
     public int printOptions(){
         System.out.println("\n" +
-                "1. Add new OpenFEC API key" + "\n" +
-                "2. View existing API key" +"\n" +
-                "3. Get data from OpenFEC API and save it to AWS DynamoDB database" +"\n" +
-                "4. Get descriptive information about the Candidate table" +"\n"+
-                "5. Exit");
+
+                "1. View existing API key" + "\n" +
+                "2. Add new OpenFEC API key" +"\n" +
+                "3. Add AWS accesskey" +"\n" +
+                "4. Add AWS secretkey" +"\n" +
+                "5. Get data from OpenFEC API and save it to AWS DynamoDB database" +"\n" +
+                "6. Get descriptive information about the Candidate table" +"\n"+
+                "7. Exit");
 
 
         Scanner input = new Scanner(System.in);
@@ -82,6 +89,14 @@ public class Menu{
         Scanner input = new Scanner(System.in);
 
         if (choice == 1) {
+
+            System.out.println("Current OpenFEC API key:" + "\n" + restClientService.getApiKey());
+            this.showMenu();
+
+        }
+
+        if (choice == 2) {
+
             System.out.println(" --- Note: This application assumes you have already setup your AWS CLI for DynamoDB --- \n Enter OpenFEC API key ");
 
             String apiKey = input.next();
@@ -90,14 +105,32 @@ public class Menu{
 
             this.showMenu();
             //menu.runCommand("Create");
+
         }
 
-        if (choice == 2) {
-            System.out.println("Current OpenFEC API key:" + "\n" + restClientService.getApiKey());
+        if (choice == 3) {
+
+            System.out.println("\n" + "Input your AWS access key for DynamoDB:");
+
+            String awsAccessKey = input.next();
+            dynamoDBConfig.setAmazonAWSAccessKey(awsAccessKey);
+
             this.showMenu();
+
         }
 
-        if(choice == 3){
+        if (choice == 4) {
+
+            System.out.println("\n" + "Input your AWS secret key for DynamoDB:" + "\n" + restClientService.getApiKey());
+
+            String awsSecretKey = input.next();
+            dynamoDBConfig.setAmazonAWSSecretKey(awsSecretKey);
+
+            this.showMenu();
+
+        }
+
+        if(choice == 5){
             System.out.println("-----------  Starting  --------");
 
             this.candidates = candidateGetRequestCommand.executeCandidateGetRequest();
@@ -108,7 +141,7 @@ public class Menu{
 
         }
 
-        if(choice == 4){
+        if(choice == 6){
 
             // Print out values openFEC api data
             candidates.forEach(candidate -> { System.out.println(candidate.getCandidate_id() + " " +candidate.getName()); });
@@ -118,8 +151,8 @@ public class Menu{
             this.showMenu();
         }
 
-        if (choice == 5) {
-            System.out.println("Thanks for using OpenFEC RestClient");
+        if (choice == 7) {
+            System.out.println("Thanks for using GetOpenFEC. Goodbye.");
             System.exit(0);
         }
     }
