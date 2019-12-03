@@ -33,7 +33,7 @@ public class RestclientApplication {
     @PostConstruct
     public void startApplication() {
 
-        System.out.println("--- OpenFEC RestClient application ---"+ "\n");
+        System.out.println("\n"+ "--- OpenFEC RestClient application ---"+ "\n" + "Note: This application requires API keys for OpenFEC and AWS Dynamodb (Access and Secret)"+ "\n");
 
         // Client creates Invoker object, command object and configure them
 
@@ -42,6 +42,7 @@ public class RestclientApplication {
         menu.setCommand("CandidateGetRequest", createCommand);
 
         //Invoker invokes command
+        menu.displayCurrentKeys();
         int result = menu.printOptions();
 
         menu.chooseOption(result);

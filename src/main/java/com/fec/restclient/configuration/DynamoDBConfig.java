@@ -55,4 +55,12 @@ public class DynamoDBConfig {
     public void setAmazonAWSSecretKey(String amazonAWSSecretKey) {
         this.amazonAWSSecretKey = amazonAWSSecretKey;
     }
+
+    public String getAmazonAWSAccessKey() {
+        return amazonAWSAccessKey;
+    }
+
+    public String getAmazonAWSSecretKey() {
+        return amazonAWSSecretKey;
+    }
 }

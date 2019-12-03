@@ -46,8 +46,11 @@ public class Menu{
 
     Iterable<Candidate> candidates;
 
-
     Map<String, Command> menuItems = new HashMap();
+
+    String openFECkey;
+    String awsAccessKey;
+    String awsSecretKey;
 
     public void setCommand(String operation, Command cmd) {
         menuItems.put(operation, cmd);
@@ -68,10 +71,10 @@ public class Menu{
     public int printOptions(){
         System.out.println("\n" +
 
-                "1. View existing API key" + "\n" +
-                "2. Add new OpenFEC API key" +"\n" +
-                "3. Add AWS accesskey" +"\n" +
-                "4. Add AWS secretkey" +"\n" +
+                "1. View API keys" + "\n" +
+                "2. Input new OpenFEC API key" +"\n" +
+                "3. Input new AWS access key" +"\n" +
+                "4. Input new AWS secret key" +"\n" +
                 "5. Get data from OpenFEC API and save it to AWS DynamoDB database" +"\n" +
                 "6. Get descriptive information about the Candidate table" +"\n"+
                 "7. Exit");
@@ -90,7 +93,8 @@ public class Menu{
 
         if (choice == 1) {
 
-            System.out.println("Current OpenFEC API key:" + "\n" + restClientService.getApiKey());
+            this.displayCurrentKeys();
+
             this.showMenu();
 
         }
@@ -131,24 +135,39 @@ public class Menu{
         }
 
         if(choice == 5){
-            System.out.println("-----------  Starting  --------");
 
-            this.candidates = candidateGetRequestCommand.executeCandidateGetRequest();
+            if (this.apiKeyCount() == 3){
 
-            candidateDBSave.executeCandidateDBSave(candidates);
+                System.out.println("-----------  Starting  --------");
 
-            this.showMenu();
+                this.candidates = candidateGetRequestCommand.executeCandidateGetRequest();
 
+                candidateDBSave.executeCandidateDBSave(candidates);
+
+                this.showMenu();
+            }
+            else{
+                System.out.println("Make sure all three required keys have been entered");
+                this.showMenu();
+            }
         }
 
         if(choice == 6){
 
-            // Print out values openFEC api data
-            candidates.forEach(candidate -> { System.out.println(candidate.getCandidate_id() + " " +candidate.getName()); });
+            if(candidates != null) {
+                // Print out values openFEC api data
+                candidates.forEach(candidate -> {
+                    System.out.println(candidate.getCandidate_id() + " " + candidate.getName());
+                });
 
-            Long itemCount = dataProcessService.getAmazonDynamoDB().describeTable("Candidate").getTable().getItemCount();
-            System.out.println("Rows in Candidate table " + itemCount + " -- only updated every six hours");
-            this.showMenu();
+                Long itemCount = dataProcessService.getAmazonDynamoDB().describeTable("Candidate").getTable().getItemCount();
+                System.out.println("Rows in Candidate table " + itemCount + " -- only updated every six hours");
+                this.showMenu();
+            }
+            else{
+                System.out.println("\n"+"Candidates iterator is null, make request first before trying to view it"+ "\n");
+                this.showMenu();
+            }
         }
 
         if (choice == 7) {
@@ -162,4 +181,53 @@ public class Menu{
         this.chooseOption(result);
     }
 
+    public void displayCurrentKeys() {
+
+        // AWS Secret key
+        if (this.openFECkey != null && this.openFECkey.length() > 4) {
+            System.out.printf("%-10s %15s\n", "OpenFEC", "***" + this.openFECkey.substring(this.openFECkey.length() - 4));
+        }
+        else{
+            System.out.printf("%-10s %15s\n", "OpenFEC", "key required");
+        }
+        // AWS Access key
+        if (this.awsAccessKey != null && this.awsAccessKey.length() > 4) {
+            System.out.printf("%-10s %15s\n", "AWS access", "***" + this.awsAccessKey.substring(this.awsAccessKey.length() - 4));
+        } else {
+            System.out.printf("%-10s %15s\n", "AWS access", "key required");
+        }
+
+        // AWS Secret key
+        if (this.awsSecretKey != null && this.awsSecretKey.length() > 4) {
+            System.out.printf("%-10s %15s\n", "AWS secret", "***" + this.awsSecretKey.substring(this.awsSecretKey.length() - 4));
+        } else {
+            System.out.printf("%-10s %15s\n", "AWS secret", "key required");
+        }
+    }
+
+    public int apiKeyCount(){
+
+        this.openFECkey = null;
+        this.awsAccessKey = null;
+        this.awsSecretKey = null;
+
+        int count = 0;
+
+        if (restClientService.getApiKey().length() != 0) {
+            openFECkey = restClientService.getApiKey();
+            count++;
+        }
+
+        if (dynamoDBConfig.getAmazonAWSAccessKey().length() != 0) {
+            awsAccessKey = dynamoDBConfig.getAmazonAWSAccessKey();
+            count++;
+        }
+
+        if (dynamoDBConfig.getAmazonAWSSecretKey().length() != 0) {
+            awsSecretKey = dynamoDBConfig.getAmazonAWSSecretKey();
+            count++;
+        }
+
+        return count;
+    }
 }
