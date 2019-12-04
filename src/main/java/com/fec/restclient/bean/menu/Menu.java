@@ -71,7 +71,7 @@ public class Menu{
     public int printOptions(){
         System.out.println("\n" +
 
-                "1. View API keys" + "\n" +
+                "1. View API keys" + "\n" +
                 "2. Input new OpenFEC API key" +"\n" +
                 "3. Input new AWS access key" +"\n" +
                 "4. Input new AWS secret key" +"\n" +
