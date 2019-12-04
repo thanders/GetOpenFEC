@@ -24,11 +24,9 @@ import org.springframework.context.annotation.PropertySource;
 @EnableDynamoDBRepositories(basePackageClasses = {CandidateRepository.class, CandidateTestRepository.class, DataProcessService.class})
 public class DynamoDBConfig {
 
-    @Value("${amazon.aws.accesskey}")
-    private String amazonAWSAccessKey;
+    private String amazonAWSAccessKey = "";
 
-    @Value("${amazon.aws.secretkey}")
-    private String amazonAWSSecretKey;
+    private String amazonAWSSecretKey = "";
 
     public AWSCredentialsProvider amazonAWSCredentialsProvider() {
         return new AWSStaticCredentialsProvider(amazonAWSCredentials());

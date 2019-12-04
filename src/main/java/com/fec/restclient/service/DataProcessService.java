@@ -40,7 +40,10 @@ public class DataProcessService {
     public void instantiateMapper(){
 ;
         // Create instance of DynamoDBmapper
+        System.out.println("TABLES:  "+ amazonDynamoDB.listTables());
+
         this.dynamoDBMapper = new DynamoDBMapper(amazonDynamoDB);
+
 
 
     }
