@@ -106,7 +106,7 @@ public class Menu{
             String apiKey = input.next();
 
             this.setApiKey(apiKey);
-
+            this.openFECkey =apiKey;
             this.showMenu();
             //menu.runCommand("Create");
 
@@ -118,6 +118,7 @@ public class Menu{
 
             String awsAccessKey = input.next();
             dynamoDBConfig.setAmazonAWSAccessKey(awsAccessKey);
+            this.awsAccessKey = awsAccessKey;
 
             this.showMenu();
 
@@ -125,10 +126,11 @@ public class Menu{
 
         if (choice == 4) {
 
-            System.out.println("\n" + "Input your AWS secret key for DynamoDB:" + "\n" + restClientService.getApiKey());
+            System.out.println("\n" + "Input your AWS secret key for DynamoDB:" + "\n");
 
             String awsSecretKey = input.next();
             dynamoDBConfig.setAmazonAWSSecretKey(awsSecretKey);
+            this.awsSecretKey = awsSecretKey;
 
             this.showMenu();
 
@@ -184,22 +186,22 @@ public class Menu{
     public void displayCurrentKeys() {
 
         // AWS Secret key
-        if (this.openFECkey != null && this.openFECkey.length() > 4) {
-            System.out.printf("%-10s %15s\n", "OpenFEC", "***" + this.openFECkey.substring(this.openFECkey.length() - 4));
+        if (this.openFECkey != null && this.openFECkey.length() > 2) {
+            System.out.printf("%-10s %15s\n", "OpenFEC", "***" + this.openFECkey.substring(this.openFECkey.length() - 2));
         }
         else{
             System.out.printf("%-10s %15s\n", "OpenFEC", "key required");
         }
         // AWS Access key
-        if (this.awsAccessKey != null && this.awsAccessKey.length() > 4) {
-            System.out.printf("%-10s %15s\n", "AWS access", "***" + this.awsAccessKey.substring(this.awsAccessKey.length() - 4));
+        if (this.awsAccessKey != null && this.awsAccessKey.length() > 2) {
+            System.out.printf("%-10s %15s\n", "AWS access", "***" + this.awsAccessKey.substring(this.awsAccessKey.length() - 2));
         } else {
             System.out.printf("%-10s %15s\n", "AWS access", "key required");
         }
 
         // AWS Secret key
-        if (this.awsSecretKey != null && this.awsSecretKey.length() > 4) {
-            System.out.printf("%-10s %15s\n", "AWS secret", "***" + this.awsSecretKey.substring(this.awsSecretKey.length() - 4));
+        if (this.awsSecretKey != null && this.awsSecretKey.length() > 2) {
+            System.out.printf("%-10s %15s\n", "AWS secret", "***" + this.awsSecretKey.substring(this.awsSecretKey.length() - 2));
         } else {
             System.out.printf("%-10s %15s\n", "AWS secret", "key required");
         }
