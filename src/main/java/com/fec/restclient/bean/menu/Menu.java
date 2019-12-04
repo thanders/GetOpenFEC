@@ -185,6 +185,7 @@ public class Menu{
 
     public void displayCurrentKeys() {
 
+        System.out.println();
         // AWS Secret key
         if (this.openFECkey != null && this.openFECkey.length() > 2) {
             System.out.printf("%-10s %15s\n", "OpenFEC", "***" + this.openFECkey.substring(this.openFECkey.length() - 2));
