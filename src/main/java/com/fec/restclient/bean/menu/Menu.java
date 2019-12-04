@@ -143,6 +143,8 @@ public class Menu{
             if (this.apiKeyCount() == 3){
 
                 System.out.println("-----------  Starting  --------");
+                dataProcessService.setAwsAccessKey(this.awsAccessKey);
+                dataProcessService.setAwsSecretKey(this.awsSecretKey);
 
                 this.candidates = candidateGetRequestCommand.executeCandidateGetRequest();
 

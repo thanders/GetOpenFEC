@@ -1,5 +1,7 @@
 package com.fec.restclient.service;
 
+import com.amazonaws.auth.AWSStaticCredentialsProvider;
+import com.amazonaws.auth.BasicAWSCredentials;
 import com.amazonaws.regions.Regions;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
@@ -29,9 +31,16 @@ public class DataProcessService {
 
     Class<Candidate> tableName;
 
+    String awsAccessKey;
+
+    String awsSecretKey;
+
     public void connectToDB(){
+        System.out.println("Connecting to awsDynamoDB... " + awsAccessKey+ " " + awsSecretKey);
+        BasicAWSCredentials awsCreds = new BasicAWSCredentials(awsAccessKey, awsSecretKey);
         this.amazonDynamoDB = AmazonDynamoDBClientBuilder.standard()
                 .withRegion(Regions.US_EAST_1)
+                .withCredentials(new AWSStaticCredentialsProvider(awsCreds))
                 .build();
         System.out.println("Connection details");
         System.out.println(this.amazonDynamoDB.listTables());
@@ -114,7 +123,13 @@ public class DataProcessService {
         return amazonDynamoDB;
     }
 
+    public void setAwsAccessKey(String awsAccessKey) {
+        this.awsAccessKey = awsAccessKey;
+    }
 
+    public void setAwsSecretKey(String awsSecretKey) {
+        this.awsSecretKey = awsSecretKey;
+    }
 }
 
 
