@@ -36,7 +36,7 @@ public class DataProcessService {
     String awsSecretKey;
 
     public void connectToDB(){
-        System.out.println("Connecting to awsDynamoDB... " + awsAccessKey+ " " + awsSecretKey);
+
         BasicAWSCredentials awsCreds = new BasicAWSCredentials(awsAccessKey, awsSecretKey);
         this.amazonDynamoDB = AmazonDynamoDBClientBuilder.standard()
                 .withRegion(Regions.US_EAST_1)

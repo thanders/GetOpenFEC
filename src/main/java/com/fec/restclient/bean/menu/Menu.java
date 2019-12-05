@@ -44,6 +44,9 @@ public class Menu{
     @Autowired
     DynamoDBConfig dynamoDBConfig;
 
+    @Autowired
+    ConsoleColors consoleColors;
+
     Iterable<Candidate> candidates;
 
     Map<String, Command> menuItems = new HashMap();
@@ -101,7 +104,8 @@ public class Menu{
 
         if (choice == 2) {
 
-            System.out.println(" --- Note: This application assumes you have already setup your AWS CLI for DynamoDB --- \n Enter OpenFEC API key ");
+            System.out.println(" --- Note: This application assumes you have already setup your AWS CLI for DynamoDB ---"
+                    +"\n" + consoleColors.BLUE + " Enter OpenFEC API key " + ConsoleColors.RESET );
 
             String apiKey = input.next();
 
@@ -114,7 +118,9 @@ public class Menu{
 
         if (choice == 3) {
 
-            System.out.println("\n" + "Input your AWS access key for DynamoDB:");
+            System.out.println("\n" + consoleColors.BLUE
+                    + "Input your AWS access key for DynamoDB:"
+                    + ConsoleColors.RESET );
 
             String awsAccessKey = input.next();
             dynamoDBConfig.setAmazonAWSAccessKey(awsAccessKey);
@@ -126,7 +132,8 @@ public class Menu{
 
         if (choice == 4) {
 
-            System.out.println("\n" + "Input your AWS secret key for DynamoDB:" + "\n");
+            System.out.println("\n" + consoleColors.BLUE + "Input your AWS secret key for DynamoDB:" +
+                    ConsoleColors.RESET +"\n");
 
             String awsSecretKey = input.next();
             dynamoDBConfig.setAmazonAWSSecretKey(awsSecretKey);
@@ -195,20 +202,20 @@ public class Menu{
             System.out.printf("%-10s %15s\n", "OpenFEC", "***" + this.openFECkey.substring(this.openFECkey.length() - 2));
         }
         else{
-            System.out.printf("%-10s %15s\n", "OpenFEC", "key required");
+            System.out.printf("%-10s %10s %15s\n", "OpenFEC", ConsoleColors.RED, "key required" + ConsoleColors.RESET);
         }
         // AWS Access key
         if (this.awsAccessKey != null && this.awsAccessKey.length() > 2) {
-            System.out.printf("%-10s %15s\n", "AWS access", "***" + this.awsAccessKey.substring(this.awsAccessKey.length() - 2));
+            System.out.printf("%-10s  %15s\n", "AWS access", "***" + this.awsAccessKey.substring(this.awsAccessKey.length() - 2));
         } else {
-            System.out.printf("%-10s %15s\n", "AWS access", "key required");
+            System.out.printf("%-10s %10s %15s\n", "AWS access", ConsoleColors.RED, "key required" + ConsoleColors.RESET);
         }
 
         // AWS Secret key
         if (this.awsSecretKey != null && this.awsSecretKey.length() > 2) {
             System.out.printf("%-10s %15s\n", "AWS secret", "***" + this.awsSecretKey.substring(this.awsSecretKey.length() - 2));
         } else {
-            System.out.printf("%-10s %15s\n", "AWS secret", "key required");
+            System.out.printf("%-10s  %9s %15s\n", "AWS secret", ConsoleColors.RED, "key required" + ConsoleColors.RESET);
         }
     }
 
