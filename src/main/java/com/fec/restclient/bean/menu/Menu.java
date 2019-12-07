@@ -80,7 +80,8 @@ public class Menu{
                 "4. Input new AWS secret key" +"\n" +
                 "5. Get data from OpenFEC API and save it to AWS DynamoDB database" +"\n" +
                 "6. Get descriptive information about the Candidate table" +"\n"+
-                "7. Exit");
+                "7. Exit"+
+                "8. Get Environment Variable");
 
 
         Scanner input = new Scanner(System.in);
@@ -90,7 +91,7 @@ public class Menu{
         return result;
     }
 
-    public void chooseOption(int choice){
+    public void chooseOption(int choice) {
 
         Scanner input = new Scanner(System.in);
 
@@ -105,12 +106,12 @@ public class Menu{
         if (choice == 2) {
 
             System.out.println(" --- Note: This application assumes you have already setup your AWS CLI for DynamoDB ---"
-                    +"\n" + consoleColors.BLUE + " Enter OpenFEC API key " + ConsoleColors.RESET );
+                    + "\n" + consoleColors.BLUE + " Enter OpenFEC API key " + ConsoleColors.RESET);
 
             String apiKey = input.next();
 
             this.setApiKey(apiKey);
-            this.openFECkey =apiKey;
+            this.openFECkey = apiKey;
             this.showMenu();
             //menu.runCommand("Create");
 
@@ -120,7 +121,7 @@ public class Menu{
 
             System.out.println("\n" + consoleColors.BLUE
                     + "Input your AWS access key for DynamoDB:"
-                    + ConsoleColors.RESET );
+                    + ConsoleColors.RESET);
 
             String awsAccessKey = input.next();
             dynamoDBConfig.setAmazonAWSAccessKey(awsAccessKey);
@@ -133,7 +134,7 @@ public class Menu{
         if (choice == 4) {
 
             System.out.println("\n" + consoleColors.BLUE + "Input your AWS secret key for DynamoDB:" +
-                    ConsoleColors.RESET +"\n");
+                    ConsoleColors.RESET + "\n");
 
             String awsSecretKey = input.next();
             dynamoDBConfig.setAmazonAWSSecretKey(awsSecretKey);
@@ -143,11 +144,10 @@ public class Menu{
 
         }
 
-        if(choice == 5){
+        if (choice == 5) {
 
 
-
-            if (this.apiKeyCount() == 3){
+            if (this.apiKeyCount() == 3) {
 
                 System.out.println("-----------  Starting  --------");
                 dataProcessService.setAwsAccessKey(this.awsAccessKey);
@@ -158,16 +158,15 @@ public class Menu{
                 candidateDBSave.executeCandidateDBSave(candidates);
 
                 this.showMenu();
-            }
-            else{
+            } else {
                 System.out.println("Make sure all three required keys have been entered");
                 this.showMenu();
             }
         }
 
-        if(choice == 6){
+        if (choice == 6) {
 
-            if(candidates != null) {
+            if (candidates != null) {
                 // Print out values openFEC api data
                 candidates.forEach(candidate -> {
                     System.out.println(candidate.getCandidate_id() + " " + candidate.getName());
@@ -176,9 +175,8 @@ public class Menu{
                 Long itemCount = dataProcessService.getAmazonDynamoDB().describeTable("Candidate").getTable().getItemCount();
                 System.out.println("Rows in Candidate table " + itemCount + " -- only updated every six hours");
                 this.showMenu();
-            }
-            else{
-                System.out.println("\n"+"Candidates iterator is null, make request first before trying to view it"+ "\n");
+            } else {
+                System.out.println("\n" + "Candidates iterator is null, make request first before trying to view it" + "\n");
                 this.showMenu();
             }
         }
@@ -187,7 +185,16 @@ public class Menu{
             System.out.println("Thanks for using GetOpenFEC. Goodbye.");
             System.exit(0);
         }
+
+        if (choice == 8) {
+
+            System.out.println("Environment variables:");
+            System.out.println(System.getenv("SNAP_USER_DATA"));
+            System.out.println(System.getenv("JAVA_HOME"));
+        }
     }
+
+
 
     public void showMenu(){
         int result = this.printOptions();
