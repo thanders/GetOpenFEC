@@ -6,6 +6,8 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
+import java.util.List;
+import java.util.stream.Collectors;
 
 
 @Component
@@ -33,6 +35,7 @@ public class FileWriterService {
 
         else{
             System.out.println("File already exists");
+
         }
         return false;
     }
@@ -78,6 +81,41 @@ public class FileWriterService {
         } catch (IOException e) {
             e.printStackTrace();
         }
+    }
+
+    public List<String> replaceLine(String keyName, String fileName){
+
+        /*
+        try {
+            Files.lines(Paths.get(fileName))
+                    .map(line -> line.trim())
+                    .filter(line -> line.startsWith("aws"))
+                    .forEach(System.out::println);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        */
+        String replaceString = "dingle";
+
+        try {
+            return Files.lines(Paths.get(fileName)) //Get each line from source file
+
+                    //in this .map for each line check if it starts with new orders. if it does then replace that with our String
+                    .map(line -> {if(line.startsWith(keyName )){
+                        return replaceString;
+                    } else {
+                        return line;
+                    }
+                    } )
+
+                    //peek to print values in console. This can be removed after testing
+                    .peek(System.out::println)
+                    //finally put everything in a collection and send it back
+                    .collect(Collectors.toList());
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+        return null;
     }
 
 }

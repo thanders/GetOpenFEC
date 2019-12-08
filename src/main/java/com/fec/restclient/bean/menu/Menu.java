@@ -152,6 +152,8 @@ public class Menu{
 
             else{
                 System.out.println("File already exists, replace key?");
+                fileWriterService.replaceLine("awsAccessKey", keysFile);
+
             }
 
 
