@@ -84,7 +84,7 @@ public class FileWriterService {
         }
     }
 
-    public List<String> replaceLine(String keyName, String fileName){
+    public void replaceLine(String keyName, String fileName, String keyValue){
 
         //Instantiating the Scanner class to read the file
         Scanner sc = null;
@@ -109,6 +109,10 @@ public class FileWriterService {
         String newLine = "Enjoy the free content";
         //Replacing the old line with new line
         fileContents = fileContents.replaceAll(oldLine, newLine);
+
+        File oldFile = new File(fileName);
+        oldFile.delete();
+
         //instantiating the FileWriter class
         FileWriter writer = null;
         try {
@@ -122,7 +126,6 @@ public class FileWriterService {
             e.printStackTrace();
         }
 
-        return null;
     }
 
 }

@@ -152,10 +152,9 @@ public class Menu{
 
             else{
                 System.out.println("File already exists, replace key?");
-                List<String> result = fileWriterService.replaceLine("awsAccessKey", keysFile);
+                fileWriterService.replaceLine("awsAccessKey", keysFile, this.awsAccessKey);
 
-                System.out.println("Result:");
-                result.forEach(System.out::println);
+                System.out.println("done.");
             }
 
 
