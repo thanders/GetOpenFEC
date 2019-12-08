@@ -7,10 +7,14 @@ import com.fec.restclient.bean.command.CandidateGetRequestCommand;
 import com.fec.restclient.bean.command.Command;
 import com.fec.restclient.configuration.DynamoDBConfig;
 import com.fec.restclient.service.DataProcessService;
+import com.fec.restclient.service.FileWriterService;
 import com.fec.restclient.service.RestClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -46,6 +50,9 @@ public class Menu{
 
     @Autowired
     ConsoleColors consoleColors;
+
+    @Autowired
+    FileWriterService fileWriterService;
 
     Iterable<Candidate> candidates;
 
@@ -188,9 +195,23 @@ public class Menu{
 
         if (choice == 8) {
 
+            String myKey="testAwsAccess";
+            String mySecretKey ="testAwsSecret";
+
             System.out.println("Environment variables:");
             System.out.println(System.getenv("SNAP_USER_DATA"));
             System.out.println(System.getenv("JAVA_HOME"));
+            System.out.println(System.getenv("SNAP_USER_COMMON"));
+
+            String userData= System.getenv("SNAP_USER_DATA");
+
+            fileWriterService.createFile(userData+"keys.txt");
+            fileWriterService.writeLine("awsAccessKey"+","+ myKey);
+            fileWriterService.writeLine("awsSecretKey"+","+ mySecretKey);
+            fileWriterService.close();
+
+            fileWriterService.readFile("keys.txt");
+
         }
     }
 
