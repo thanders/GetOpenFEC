@@ -7,7 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
-import java.util.stream.Collectors;
+import java.util.Scanner;
 
 
 @Component
@@ -16,6 +16,7 @@ public class FileWriterService {
 
     String lineValue;
     PrintWriter writer;
+    String awsAccessLine = "awsAccessKey";
 
     public boolean createFile(String filename){
 
@@ -85,36 +86,42 @@ public class FileWriterService {
 
     public List<String> replaceLine(String keyName, String fileName){
 
-        /*
+        //Instantiating the Scanner class to read the file
+        Scanner sc = null;
         try {
-            Files.lines(Paths.get(fileName))
-                    .map(line -> line.trim())
-                    .filter(line -> line.startsWith("aws"))
-                    .forEach(System.out::println);
+            sc = new Scanner(new File(fileName));
+        } catch (FileNotFoundException e) {
+            e.printStackTrace();
+        }
+        //instantiating the StringBuffer class
+        StringBuffer buffer = new StringBuffer();
+        //Reading lines of the file and appending them to StringBuffer
+        while (sc.hasNextLine()) {
+            buffer.append(sc.nextLine()+System.lineSeparator());
+        }
+        String fileContents = buffer.toString();
+        System.out.println("Contents of the file: "+fileContents);
+        //closing the Scanner object
+        sc.close();
+
+        String oldLine = fileContents.lines().filter(line -> line.startsWith(this.awsAccessLine)).toString();
+
+        String newLine = "Enjoy the free content";
+        //Replacing the old line with new line
+        fileContents = fileContents.replaceAll(oldLine, newLine);
+        //instantiating the FileWriter class
+        FileWriter writer = null;
+        try {
+            writer = new FileWriter(fileName);
+
+            System.out.println("");
+            System.out.println("new data: "+fileContents);
+            writer.append(fileContents);
+            writer.flush();
         } catch (IOException e) {
             e.printStackTrace();
         }
-        */
-        String replaceString = "dingle";
 
-        try {
-            return Files.lines(Paths.get(fileName)) //Get each line from source file
-
-                    //in this .map for each line check if it starts with new orders. if it does then replace that with our String
-                    .map(line -> {if(line.startsWith(keyName )){
-                        return replaceString;
-                    } else {
-                        return line;
-                    }
-                    } )
-
-                    //peek to print values in console. This can be removed after testing
-                    .peek(System.out::println)
-                    //finally put everything in a collection and send it back
-                    .collect(Collectors.toList());
-        } catch (IOException e) {
-            e.printStackTrace();
-        }
         return null;
     }
 
