@@ -137,13 +137,27 @@ public class Menu{
 
             String userData= System.getenv("SNAP_USER_DATA");
             String keysFile= userData+"/keys.txt";
-            fileWriterService.createFile(keysFile);
-            fileWriterService.writeLine("awsAccessKey"+","+ awsAccessKey);
-            fileWriterService.close();
+            boolean created = fileWriterService.createFile(keysFile);
 
-            fileWriterService.getAwsAccessKey(keysFile, "awsAccessKey");
+            if (created) {
+                System.out.println("Creating key...");
+                fileWriterService.writeLine("awsAccessKey" + "," + awsAccessKey);
+                fileWriterService.close();
+
+                String accessKey = fileWriterService.getAwsAccessKey(keysFile, "awsAccessKey");
+
+                System.out.println("your key " + accessKey);
+
+            }
+
+            else{
+                System.out.println("File already exists, replace key?");
+            }
+
+
 
             this.showMenu();
+
 
         }
 

@@ -5,6 +5,7 @@ import org.springframework.stereotype.Component;
 import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.util.ArrayList;
 
 
 @Component
@@ -14,7 +15,7 @@ public class FileWriterService {
     String lineValue;
     PrintWriter writer;
 
-    public void createFile(String filename){
+    public boolean createFile(String filename){
 
         File tmpDir = new File(filename);
 
@@ -22,6 +23,7 @@ public class FileWriterService {
         if(!tmpDir.exists()) {
             try {
                 this.writer = new PrintWriter(filename, "UTF-8");
+                return true;
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
             } catch (UnsupportedEncodingException e) {
@@ -32,7 +34,7 @@ public class FileWriterService {
         else{
             System.out.println("File already exists");
         }
-
+        return false;
     }
 
     public void writeLine(String line){
@@ -46,16 +48,21 @@ public class FileWriterService {
         this.writer.close();
     }
 
-    public void getAwsAccessKey(String fileName, String keyName) {
+    public String getAwsAccessKey(String fileName, String keyName) {
+
+        ArrayList keyList = new ArrayList();
 
         try {
             Files.lines(Paths.get(fileName))
                     .map(s -> s.trim())
                     .filter(s -> s.startsWith("awsAccessKey"))
-                    .forEach(System.out::println);
+                    .forEach(keyList::add);
         } catch (IOException e) {
             e.printStackTrace();
         }
+
+        System.out.println(keyList.get(1).toString());
+        return keyList.get(1).toString();
 
     }
 
