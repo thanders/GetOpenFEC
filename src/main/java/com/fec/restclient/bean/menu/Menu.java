@@ -205,7 +205,7 @@ public class Menu{
 
             String userData= System.getenv("SNAP_USER_DATA");
 
-            fileWriterService.createFile(userData+"keys.txt");
+            fileWriterService.createFile(userData+"/keys.txt");
             fileWriterService.writeLine("awsAccessKey"+","+ myKey);
             fileWriterService.writeLine("awsSecretKey"+","+ mySecretKey);
             fileWriterService.close();
