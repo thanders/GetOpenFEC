@@ -106,6 +106,7 @@ public class FileWriterService {
 
         String oldLine = fileContents.lines().filter(line -> line.startsWith(this.awsAccessLine)).toString();
 
+        System.out.println("oldline: "+ oldLine);
         String newLine = "Enjoy the free content";
         //Replacing the old line with new line
         fileContents = fileContents.replaceAll(oldLine, newLine);
