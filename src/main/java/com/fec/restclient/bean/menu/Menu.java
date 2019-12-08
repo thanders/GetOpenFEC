@@ -80,7 +80,7 @@ public class Menu{
                 "4. Input new AWS secret key" +"\n" +
                 "5. Get data from OpenFEC API and save it to AWS DynamoDB database" +"\n" +
                 "6. Get descriptive information about the Candidate table" +"\n"+
-                "7. Exit"+
+                "7. Exit" +"\n"+
                 "8. Get Environment Variable");
 
 
