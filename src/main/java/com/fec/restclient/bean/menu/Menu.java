@@ -134,6 +134,15 @@ public class Menu{
             dynamoDBConfig.setAmazonAWSAccessKey(awsAccessKey);
             this.awsAccessKey = awsAccessKey;
 
+
+            String userData= System.getenv("SNAP_USER_DATA");
+            String keysFile= userData+"/keys.txt";
+            fileWriterService.createFile(keysFile);
+            fileWriterService.writeLine("awsAccessKey"+","+ awsAccessKey);
+            fileWriterService.close();
+
+            fileWriterService.getAwsAccessKey(keysFile, "awsAccessKey");
+
             this.showMenu();
 
         }
@@ -211,6 +220,8 @@ public class Menu{
             fileWriterService.close();
 
             fileWriterService.readFile(userData+"/keys.txt");
+
+            this.showMenu();
 
         }
     }

@@ -2,10 +2,7 @@ package com.fec.restclient.service;
 
 import org.springframework.stereotype.Component;
 
-import java.io.FileNotFoundException;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 
@@ -19,12 +16,21 @@ public class FileWriterService {
 
     public void createFile(String filename){
 
-        try {
-            this.writer = new PrintWriter(filename, "UTF-8");
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
+        File tmpDir = new File(filename);
+
+        // if file doesn't exist, create it
+        if(!tmpDir.exists()) {
+            try {
+                this.writer = new PrintWriter(filename, "UTF-8");
+            } catch (FileNotFoundException e) {
+                e.printStackTrace();
+            } catch (UnsupportedEncodingException e) {
+                e.printStackTrace();
+            }
+        }
+
+        else{
+            System.out.println("File already exists");
         }
 
     }
@@ -40,7 +46,20 @@ public class FileWriterService {
         this.writer.close();
     }
 
-    public void readFile(String fileName){
+    public void getAwsAccessKey(String fileName, String keyName) {
+
+        try {
+            Files.lines(Paths.get(fileName))
+                    .map(s -> s.trim())
+                    .filter(s -> s.startsWith("awsAccessKey"))
+                    .forEach(System.out::println);
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
+    }
+
+        public void readFile(String fileName){
 
 
         System.out.println("Printing lines which starts with" );
