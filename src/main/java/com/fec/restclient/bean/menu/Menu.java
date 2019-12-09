@@ -13,9 +13,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.File;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Scanner;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.*;
 
 /*
  * Invoker class, which holds command object and invokes method
@@ -58,6 +61,9 @@ public class Menu{
     String openFECkey;
     String awsAccessKey;
     String awsSecretKey;
+    String rowToSave;
+    String keysFile = "";
+    String awsAccessKeyName = "awsAccessKey";
 
     public void setCommand(String operation, Command cmd) {
         menuItems.put(operation, cmd);
@@ -85,7 +91,8 @@ public class Menu{
                 "5. Get data from OpenFEC API and save it to AWS DynamoDB database" +"\n" +
                 "6. Get descriptive information about the Candidate table" +"\n"+
                 "7. Exit" +"\n"+
-                "8. Get Environment Variable");
+                "8. Get Environment Variable"+"\n"+
+                "9. Delete keylist");
 
 
         Scanner input = new Scanner(System.in);
@@ -134,12 +141,22 @@ public class Menu{
 
             String userData= System.getenv("SNAP_USER_DATA");
             String keysFile= userData+"/keys.txt";
+            this.keysFile = keysFile;
+
+            fileWriterService.setFileName(keysFile);
+
+            this.rowToSave = "awsAccessKey" + "," + awsAccessKey;
+
             boolean created = fileWriterService.createFile(keysFile);
 
+            // File created, add the key
             if (created) {
-                System.out.println("Creating key...");
-                fileWriterService.writeLine("awsAccessKey" + "," + awsAccessKey);
+                System.out.println("Adding key...");
+                fileWriterService.writeLine(rowToSave);
                 fileWriterService.close();
+
+                System.out.println("Location "+keysFile);
+
 
                 String accessKey = fileWriterService.getAwsAccessKey(keysFile, "awsAccessKey");
 
@@ -147,21 +164,59 @@ public class Menu{
 
             }
 
+            // File already exists, replace the key
             else{
-                System.out.println("File already exists, replace key?");
+                System.out.println("File already exists... replace the key");
 
+                List<String> fileArray = fileWriterService.fileToArray();
+                System.out.println("Does this exist? "+ fileArray.get(0));
                 fileWriterService.deleteFile(keysFile);
 
-                fileWriterService.replaceLine("awsAccessKey", keysFile, this.awsAccessKey);
+                ArrayList<String> newArray = new ArrayList();
 
+                for(String line : fileArray){
+                    System.out.println("loop - "+line);
+                    if(line.contains("awsAccessKey")){
+                        System.out.println("dingle " + this.rowToSave);
+                        newArray.add(this.rowToSave);
+                    }
+                    else {
+                        newArray.add(line);
+                    }
+                }
+
+                fileWriterService.createFile(keysFile);
+                System.out.println("Adding key...");
+
+                FileWriter fileWriter = null;
+                try {
+                    fileWriter = new FileWriter(keysFile);
+                    PrintWriter printWriter = new PrintWriter(fileWriter);
+
+                    for(String arr : newArray) {
+                        System.out.println(arr);
+                        printWriter.println(arr);
+                    }
+                    printWriter.close();
+
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
+
+                fileWriterService.close();
+
+                System.out.println("Check location ... "+ keysFile);
+
+                String accessKey = fileWriterService.getAwsAccessKey(keysFile, "awsAccessKey");
+/*
+                System.out.println("your key " + accessKey);
+
+                //fileWriterService.replaceLine("awsAccessKey", keysFile, this.awsAccessKey);
+*/
                 System.out.println("done.");
             }
-
-
-
+            System.out.println("does this print??");
             this.showMenu();
-
-
         }
 
         if (choice == 4) {
@@ -241,6 +296,12 @@ public class Menu{
             this.showMenu();
 
         }
+
+        if (choice == 9) {
+
+            fileWriterService.deleteFile(this.keysFile);
+            this.showMenu();
+        }
     }
 
 
@@ -273,6 +334,17 @@ public class Menu{
         } else {
             System.out.printf("%-10s  %9s %15s\n", "AWS secret", ConsoleColors.RED, "key required" + ConsoleColors.RESET);
         }
+
+        File keyFile = new File(this.keysFile);
+        if(keyFile.exists()) {
+            System.out.println("File exists... ");
+            String key= fileWriterService.getAwsAccessKey(this.keysFile, this.awsAccessKeyName);
+            System.out.println("awsKey "+ key);
+        }
+        else{
+            System.out.println("file does not exist");
+        }
+
     }
 
     public int apiKeyCount(){
