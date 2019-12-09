@@ -138,8 +138,7 @@ public class Menu{
             dynamoDBConfig.setAmazonAWSAccessKey(awsAccessKey);
             this.awsAccessKey = awsAccessKey;
 
-
-            String userData= System.getenv("SNAP_USER_DATA");
+            String userData= System.getenv("SNAP_USER_COMMON");
             String keysFile= userData+"/keys.txt";
             this.keysFile = keysFile;
 
