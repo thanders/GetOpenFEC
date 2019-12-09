@@ -12,11 +12,8 @@ import com.fec.restclient.service.RestClientService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
+import java.io.File;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
@@ -152,6 +149,9 @@ public class Menu{
 
             else{
                 System.out.println("File already exists, replace key?");
+
+                fileWriterService.deleteFile(keysFile);
+
                 fileWriterService.replaceLine("awsAccessKey", keysFile, this.awsAccessKey);
 
                 System.out.println("done.");

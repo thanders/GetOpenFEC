@@ -6,9 +6,6 @@ import java.io.*;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
-import java.util.List;
-import java.util.Scanner;
-
 
 @Component
 public class FileWriterService {
@@ -86,47 +83,35 @@ public class FileWriterService {
 
     public void replaceLine(String keyName, String fileName, String keyValue){
 
-        //Instantiating the Scanner class to read the file
-        Scanner sc = null;
         try {
-            sc = new Scanner(new File(fileName));
-        } catch (FileNotFoundException e) {
-            e.printStackTrace();
-        }
-        //instantiating the StringBuffer class
-        StringBuffer buffer = new StringBuffer();
-        //Reading lines of the file and appending them to StringBuffer
-        while (sc.hasNextLine()) {
-            buffer.append(sc.nextLine()+System.lineSeparator());
-        }
-        String fileContents = buffer.toString();
-        System.out.println("Contents of the file: "+fileContents);
-        //closing the Scanner object
-        sc.close();
+            BufferedReader file = new BufferedReader(new FileReader(fileName));
 
-        String oldLine = fileContents.lines().filter(line -> line.startsWith(this.awsAccessLine)).toString();
+            String line;
+            String input = "";
+            int count = 0;
 
-        System.out.println("oldline: "+ oldLine);
-        String newLine = "Enjoy the free content";
-        //Replacing the old line with new line
-        fileContents = fileContents.replaceAll(oldLine, newLine);
+            while ((line = file.readLine()) != null) {
+                System.out.println("replace?");
+                System.out.println("line: "+line);
+                if (line.startsWith(keyName)) {
+                    System.out.println("Replacing content...");
+                    line = line.replace(line, "replaced content");
+                }
+                input += line + "\n";
+                ++count;
+            }
 
-        File oldFile = new File(fileName);
-        oldFile.delete();
-
-        //instantiating the FileWriter class
-        FileWriter writer = null;
-        try {
-            writer = new FileWriter(fileName);
-
-            System.out.println("");
-            System.out.println("new data: "+fileContents);
-            writer.append(fileContents);
-            writer.flush();
-        } catch (IOException e) {
+        } catch (Exception e) {
             e.printStackTrace();
         }
 
+
+    }
+
+    public void deleteFile(String fileName){
+
+        File tmpDir = new File(fileName);
+        tmpDir.delete();
     }
 
 }
