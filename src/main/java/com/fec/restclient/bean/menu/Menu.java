@@ -138,6 +138,7 @@ public class Menu{
             dynamoDBConfig.setAmazonAWSAccessKey(awsAccessKey);
             this.awsAccessKey = awsAccessKey;
 
+            // Create the file path
             String userData= System.getenv("SNAP_USER_COMMON");
             String keysFile= userData+"/keys.txt";
             this.keysFile = keysFile;
@@ -297,6 +298,11 @@ public class Menu{
         }
 
         if (choice == 9) {
+
+            // Create the file path
+            String userData= System.getenv("SNAP_USER_COMMON");
+            String keysFile= userData+"/keys.txt";
+            this.keysFile = keysFile;
 
             fileWriterService.deleteFile(this.keysFile);
             this.showMenu();
