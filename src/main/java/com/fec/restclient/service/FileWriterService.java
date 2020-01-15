@@ -36,6 +36,7 @@ public class FileWriterService {
 
         else{
             System.out.println("File already exists");
+            System.out.println("Location: "+ filename);
 
         }
         return false;
@@ -72,17 +73,16 @@ public class FileWriterService {
 
         public void readFile(String fileName){
 
-
-        System.out.println("Printing lines which starts with" );
-        try {
-            Files.lines(Paths.get(fileName))
-                    .map(s -> s.trim())
-                    .filter(s -> s.startsWith("aws"))
-                            .forEach(System.out::println);
-        } catch (IOException e) {
-            e.printStackTrace();
+            System.out.println("Printing lines which starts with" );
+            try {
+                Files.lines(Paths.get(fileName))
+                        .map(s -> s.trim())
+                        .filter(s -> s.startsWith("aws"))
+                                .forEach(System.out::println);
+            } catch (IOException e) {
+                e.printStackTrace();
+            }
         }
-    }
 
     public void replaceLine(String keyName, String fileName, String keyValue){
 
