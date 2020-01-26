@@ -7,6 +7,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Map;
 
 @Component
 public class FileWriterService {
@@ -19,6 +20,7 @@ public class FileWriterService {
 
     public boolean createFile(String filename){
 
+        System.out.println("Createfile - Checking filename...");
         File tmpDir = new File(filename);
 
         // if file doesn't exist, create it
@@ -26,6 +28,7 @@ public class FileWriterService {
             try {
                 System.out.println("New file location "+filename);
                 this.writer = new PrintWriter(filename, "UTF-8");
+                this.fileName = filename;
                 return true;
             } catch (FileNotFoundException e) {
                 e.printStackTrace();
@@ -37,13 +40,41 @@ public class FileWriterService {
         else{
             System.out.println("File already exists");
             System.out.println("Location: "+ filename);
+            this.fileName = filename;
+            return false;
 
         }
         return false;
     }
 
-    public void writeLine(String line){
+    public void writekeys(Map keys){
 
+        // Write to file
+        try {
+            FileWriter fileWriter = new FileWriter(this.fileName);
+            PrintWriter printWriter = new PrintWriter(fileWriter);
+
+            keys.forEach((k, v) -> printWriter.println(k +"," +v));
+
+            printWriter.close();
+
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void writeLine(String line) throws IOException {
+        System.out.println("the line: "+ line);
+        System.out.println("blank? "+ this.fileName);
+        File tempFile = new File(this.fileName);
+        boolean exists = tempFile.exists();
+        System.out.println("exists? " + exists);
+
+        FileWriter fwriter = new FileWriter(this.fileName);
+
+        System.out.println("Writing to file...");
+        this.writer = new PrintWriter(fwriter);
+        System.out.println(this.writer.getClass());
         this.writer.println(line);
 
     }
@@ -67,8 +98,13 @@ public class FileWriterService {
             e.printStackTrace();
         }
         System.out.println("WHERE IS THIS?");
-        return keyList.get(0).toString();
-
+        if (keyList.size()== 0){
+            System.out.println("key file is empty");
+        }
+        else {
+            return keyList.get(0).toString();
+        }
+        return "empty file";
     }
 
         public void readFile(String fileName){

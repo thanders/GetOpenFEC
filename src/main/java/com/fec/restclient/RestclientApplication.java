@@ -11,6 +11,9 @@ import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 
 import javax.annotation.PostConstruct;
+import java.io.FileNotFoundException;
+import java.io.IOException;
+import java.io.UnsupportedEncodingException;
 
 @SpringBootApplication
 public class RestclientApplication {
@@ -31,7 +34,7 @@ public class RestclientApplication {
     CreateCommand createCommand;
 
     @PostConstruct
-    public void startApplication() {
+    public void startApplication() throws IOException {
 
         System.out.println("\n"+ "--- OpenFEC RestClient application ---"+ "\n" + "Note: This application requires API keys for OpenFEC and AWS Dynamodb (Access and Secret)"+ "\n");
 

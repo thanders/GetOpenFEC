@@ -1,31 +1,16 @@
 package com.fec.restclient.bean.menu;
 
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.fec.restclient.bean.Candidate;
 import com.fec.restclient.bean.command.CandidateDBSave;
 import com.fec.restclient.bean.command.CandidateGetRequestCommand;
 import com.fec.restclient.bean.command.Command;
 import com.fec.restclient.configuration.DynamoDBConfig;
-import com.fec.restclient.service.DataProcessService;
-import com.fec.restclient.service.FileWriterService;
-import com.fec.restclient.service.RestClientService;
+import com.fec.restclient.service.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
-import java.io.File;
-import java.io.FileWriter;
-import java.io.IOException;
-import java.io.PrintWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
+import java.io.*;
 import java.util.*;
-
-/*
- * Invoker class, which holds command object and invokes method
- */
-
-
-
 
 @Component
 public class Menu{
@@ -54,24 +39,26 @@ public class Menu{
     @Autowired
     FileWriterService fileWriterService;
 
+    @Autowired
+    FileReaderService fileReaderService;
+
+    @Autowired
+    KeyService keyService;
+
     Iterable<Candidate> candidates;
 
     Map<String, Command> menuItems = new HashMap();
 
+    Map<String, String> keyMap;
     String openFECkey;
     String awsAccessKey;
     String awsSecretKey;
-    String rowToSave;
-    String keysFile = "";
-    String awsAccessKeyName = "awsAccessKey";
+    String userData = System.getenv("SNAP_USER_COMMON");
+    File keysFile = new File(this.userData+"/keys.txt");
+
 
     public void setCommand(String operation, Command cmd) {
         menuItems.put(operation, cmd);
-    }
-
-    public void runCommand(String operation){
-
-        menuItems.get(operation).execute();
     }
 
     public void setApiKey(String apiKey){
@@ -90,9 +77,8 @@ public class Menu{
                 "4. Input new AWS secret key" +"\n" +
                 "5. Get data from OpenFEC API and save it to AWS DynamoDB database" +"\n" +
                 "6. Get descriptive information about the Candidate table" +"\n"+
-                "7. Exit" +"\n"+
-                "8. Get Environment Variable"+"\n"+
-                "9. Delete keylist");
+                "7. Delete keylist" +"\n"+
+                "8. Exit");
 
 
         Scanner input = new Scanner(System.in);
@@ -102,7 +88,7 @@ public class Menu{
         return result;
     }
 
-    public void chooseOption(int choice) {
+    public void chooseOption(int choice) throws IOException {
 
         Scanner input = new Scanner(System.in);
 
@@ -119,12 +105,16 @@ public class Menu{
             System.out.println(" --- Note: This application assumes you have already setup your AWS CLI for DynamoDB ---"
                     + "\n" + consoleColors.BLUE + " Enter OpenFEC API key " + ConsoleColors.RESET);
 
-            String apiKey = input.next();
+            String openFEC = input.next();
+            String keyName = "openFEC";
 
-            this.setApiKey(apiKey);
-            this.openFECkey = apiKey;
+            this.keyService.start(keyName, openFEC);
+
+            // Assign key
+            this.openFECkey = this.keyService.getKey(keyName);
+            this.setApiKey(this.openFECkey);
+
             this.showMenu();
-            //menu.runCommand("Create");
 
         }
 
@@ -134,88 +124,17 @@ public class Menu{
                     + "Input your AWS access key for DynamoDB:"
                     + ConsoleColors.RESET);
 
-            String awsAccessKey = input.next();
-            dynamoDBConfig.setAmazonAWSAccessKey(awsAccessKey);
-            this.awsAccessKey = awsAccessKey;
+            String inputAwsAccessKey = input.next();
 
-            // Create the file path
-            String userData= System.getenv("SNAP_USER_COMMON");
-            String keysFile= userData+"/keys.txt";
-            this.keysFile = keysFile;
+            dynamoDBConfig.setAmazonAWSAccessKey(inputAwsAccessKey);
+            this.awsAccessKey = inputAwsAccessKey;
+            String keyName = "awsAccessKey";
 
-            fileWriterService.setFileName(keysFile);
+            this.keyService.start(keyName, inputAwsAccessKey);
 
-            this.rowToSave = "awsAccessKey" + "," + awsAccessKey;
+            // Assign key
+            this.awsAccessKey = this.keyService.getKey(keyName);
 
-            boolean created = fileWriterService.createFile(keysFile);
-
-            // File created, add the key
-            if (created) {
-                System.out.println("Adding key...");
-                fileWriterService.writeLine(rowToSave);
-                fileWriterService.close();
-
-                System.out.println("Location "+keysFile);
-
-
-                String accessKey = fileWriterService.getAwsAccessKey(keysFile, "awsAccessKey");
-
-                System.out.println("your key " + accessKey);
-
-            }
-
-            // File already exists, replace the key
-            else{
-                System.out.println("File already exists... replace the key");
-
-                List<String> fileArray = fileWriterService.fileToArray();
-                System.out.println("Does this exist? "+ fileArray.get(0));
-                fileWriterService.deleteFile(keysFile);
-
-                ArrayList<String> newArray = new ArrayList();
-
-                for(String line : fileArray){
-                    System.out.println("loop - "+line);
-                    if(line.contains("awsAccessKey")){
-                        System.out.println("dingle " + this.rowToSave);
-                        newArray.add(this.rowToSave);
-                    }
-                    else {
-                        newArray.add(line);
-                    }
-                }
-
-                fileWriterService.createFile(keysFile);
-                System.out.println("Adding key...");
-
-                FileWriter fileWriter = null;
-                try {
-                    fileWriter = new FileWriter(keysFile);
-                    PrintWriter printWriter = new PrintWriter(fileWriter);
-
-                    for(String arr : newArray) {
-                        System.out.println(arr);
-                        printWriter.println(arr);
-                    }
-                    printWriter.close();
-
-                } catch (IOException e) {
-                    e.printStackTrace();
-                }
-
-                fileWriterService.close();
-
-                System.out.println("Check location ... "+ keysFile);
-
-                String accessKey = fileWriterService.getAwsAccessKey(keysFile, "awsAccessKey");
-/*
-                System.out.println("your key " + accessKey);
-
-                //fileWriterService.replaceLine("awsAccessKey", keysFile, this.awsAccessKey);
-*/
-                System.out.println("done.");
-            }
-            System.out.println("does this print??");
             this.showMenu();
         }
 
@@ -225,15 +144,22 @@ public class Menu{
                     ConsoleColors.RESET + "\n");
 
             String awsSecretKey = input.next();
-            dynamoDBConfig.setAmazonAWSSecretKey(awsSecretKey);
-            this.awsSecretKey = awsSecretKey;
+            String keyname = "awsSecretKey";
+            this.keyService.start(keyname, awsSecretKey);
+
+            // Get latest keymap
+            this.keyMap = this.keyService.getKeys();
+
+            // Assign key
+            this.awsSecretKey = this.keyMap.get(keyname);
+
+            dynamoDBConfig.setAmazonAWSSecretKey(this.awsSecretKey);
 
             this.showMenu();
 
         }
 
         if (choice == 5) {
-
 
             if (this.apiKeyCount() == 3) {
 
@@ -270,86 +196,70 @@ public class Menu{
         }
 
         if (choice == 7) {
+
+            // Create the file path
+            String userData= System.getenv("SNAP_USER_COMMON");
+
+            File keysFile = new File(userData+"/keys.txt");
+
+            this.keysFile = keysFile;
+
+            fileWriterService.deleteFile(this.keysFile.getPath());
+            this.showMenu();
+        }
+
+        if (choice == 8) {
             System.out.println("Thanks for using GetOpenFEC. Goodbye.");
             System.exit(0);
         }
 
-        if (choice == 8) {
-
-            String myKey="testAwsAccess";
-            String mySecretKey ="testAwsSecret";
-
-            System.out.println("Environment variables:");
-            System.out.println(System.getenv("SNAP_USER_DATA"));
-            System.out.println(System.getenv("JAVA_HOME"));
-            System.out.println(System.getenv("SNAP_USER_COMMON"));
-
-            String userData= System.getenv("SNAP_USER_DATA");
-
-            fileWriterService.createFile(userData+"/keys.txt");
-            //fileWriterService.writeLine("awsAccessKey"+","+ myKey);
-            //fileWriterService.writeLine("awsSecretKey"+","+ mySecretKey);
-            //fileWriterService.close();
-
-            //fileWriterService.readFile(userData+"/keys.txt");
-
-            this.showMenu();
-
-        }
-
-        if (choice == 9) {
-
-            // Create the file path
-            String userData= System.getenv("SNAP_USER_COMMON");
-            String keysFile= userData+"/keys.txt";
-            this.keysFile = keysFile;
-
-            fileWriterService.deleteFile(this.keysFile);
-            this.showMenu();
-        }
     }
 
 
 
-    public void showMenu(){
+    public void showMenu() throws IOException {
         int result = this.printOptions();
         this.chooseOption(result);
     }
 
     public void displayCurrentKeys() {
 
-        System.out.println();
-        // AWS Secret key
-        if (this.openFECkey != null && this.openFECkey.length() > 2) {
-            System.out.printf("%-10s %15s\n", "OpenFEC", "***" + this.openFECkey.substring(this.openFECkey.length() - 2));
+        if(this.keysFile.exists()){
+            this.keyMap = this.fileReaderService.readFile(this.keysFile);
+            System.out.println("Whoo");
+
+            this.keyMap.entrySet().forEach(el -> System.out.println(el));
+
+            System.out.println();
+
+            // If OpenFEC API Key exists:
+            if(this.keyMap.containsKey("openFEC")) {
+                System.out.printf("%-10s %16s\n", "OpenFEC", "\u2713");
+            }
+            else{
+                System.out.printf("%-10s %10s %15s\n", "OpenFEC", ConsoleColors.RED, "key required" + ConsoleColors.RESET);
+            }
+
+            // If awsAccessKey exists:
+            if(this.keyMap.containsKey("awsAccessKey")) {
+                System.out.printf("%-10s  %15s\n", "AWS access", "\u2713");
+            }
+            else {
+                System.out.printf("%-10s %10s %15s\n", "AWS access", ConsoleColors.RED, "key required" + ConsoleColors.RESET);
+            }
+
+            // If AWS Secret key exists:
+            if(this.keyMap.containsKey("awsSecretKey")) {
+                System.out.printf("%-10s  %15s\n", "AWS Secret", "\u2713");
+            }
+            else {
+                System.out.printf("%-10s  %9s %15s\n", "AWS Secret", ConsoleColors.RED, "key required" + ConsoleColors.RESET);
+            }
         }
+
         else{
-            System.out.printf("%-10s %10s %15s\n", "OpenFEC", ConsoleColors.RED, "key required" + ConsoleColors.RESET);
+            System.out.println("You have not entered any keys, file doesn't exist");
         }
-        // AWS Access key
-        if (this.awsAccessKey != null && this.awsAccessKey.length() > 2) {
-            System.out.printf("%-10s  %15s\n", "AWS access", "***" + this.awsAccessKey.substring(this.awsAccessKey.length() - 2));
-        } else {
-            System.out.printf("%-10s %10s %15s\n", "AWS access", ConsoleColors.RED, "key required" + ConsoleColors.RESET);
-        }
-
-        // AWS Secret key
-        if (this.awsSecretKey != null && this.awsSecretKey.length() > 2) {
-            System.out.printf("%-10s %15s\n", "AWS secret", "***" + this.awsSecretKey.substring(this.awsSecretKey.length() - 2));
-        } else {
-            System.out.printf("%-10s  %9s %15s\n", "AWS secret", ConsoleColors.RED, "key required" + ConsoleColors.RESET);
-        }
-
-        File keyFile = new File(this.keysFile);
-        if(keyFile.exists()) {
-            System.out.println("File exists... ");
-            String key= fileWriterService.getAwsAccessKey(this.keysFile, this.awsAccessKeyName);
-            System.out.println("awsKey "+ key);
-        }
-        else{
-            System.out.println("file does not exist");
-        }
-
     }
 
     public int apiKeyCount(){
