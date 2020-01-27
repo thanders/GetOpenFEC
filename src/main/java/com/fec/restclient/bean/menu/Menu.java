@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import java.io.*;
+import java.nio.charset.Charset;
 import java.util.*;
 
 @Component
@@ -247,10 +248,15 @@ public class Menu{
     public void displayCurrentKeys() {
 
         String check = new String(new int[] { 0x2713 }, 0, 1);
+        try {
+            System.out.write(check.getBytes(Charset.defaultCharset()));
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
 
         if(this.keysFile.exists()){
             this.keyMap = this.fileReaderService.readFile(this.keysFile);
-            
+
             System.out.println();
 
             // If OpenFEC API Key exists:
