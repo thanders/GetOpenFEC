@@ -246,17 +246,16 @@ public class Menu{
 
     public void displayCurrentKeys() {
 
+        String check = new String(new int[] { 0x2713 }, 0, 1);
+
         if(this.keysFile.exists()){
             this.keyMap = this.fileReaderService.readFile(this.keysFile);
-            System.out.println("Whoo");
-
-            this.keyMap.entrySet().forEach(el -> System.out.println(el));
-
+            
             System.out.println();
 
             // If OpenFEC API Key exists:
             if(this.keyMap.containsKey("openFEC")) {
-                System.out.printf("%-10s %16s\n", "OpenFEC", "\u2713");
+                System.out.printf("%-10s %16s\n", "OpenFEC", check);
             }
             else{
                 System.out.printf("%-10s %10s %15s\n", "OpenFEC", ConsoleColors.RED, "key required" + ConsoleColors.RESET);
@@ -264,7 +263,7 @@ public class Menu{
 
             // If awsAccessKey exists:
             if(this.keyMap.containsKey("awsAccessKey")) {
-                System.out.printf("%-10s  %15s\n", "AWS access", "\u2713");
+                System.out.printf("%-10s  %15s\n", "AWS access", check);
             }
             else {
                 System.out.printf("%-10s %10s %15s\n", "AWS access", ConsoleColors.RED, "key required" + ConsoleColors.RESET);
@@ -272,7 +271,7 @@ public class Menu{
 
             // If AWS Secret key exists:
             if(this.keyMap.containsKey("awsSecretKey")) {
-                System.out.printf("%-10s  %15s\n", "AWS Secret", "\u2713");
+                System.out.printf("%-10s  %15s\n", "AWS Secret", check);
             }
             else {
                 System.out.printf("%-10s  %9s %15s\n", "AWS Secret", ConsoleColors.RED, "key required" + ConsoleColors.RESET);
