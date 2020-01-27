@@ -68,30 +68,52 @@ public class Menu{
 
     }
 
-    public int printOptions(){
-        System.out.println("\n" +
+    public int printOptions() {
+        System.out.println(
+                "\n" +
+                "Pick one of the following options:"+ "\n" + "\n" +
 
                 "1. View API keys" + "\n" +
-                "2. Input new OpenFEC API key" +"\n" +
-                "3. Input new AWS access key" +"\n" +
-                "4. Input new AWS secret key" +"\n" +
-                "5. Get data from OpenFEC API and save it to AWS DynamoDB database" +"\n" +
-                "6. Get descriptive information about the Candidate table" +"\n"+
-                "7. Delete keylist" +"\n"+
+                "2. Input new OpenFEC API key" + "\n" +
+                "3. Input new AWS access key" + "\n" +
+                "4. Input new AWS secret key" + "\n" +
+                "5. Get data from OpenFEC API and save it to AWS DynamoDB database" + "\n" +
+                "6. View summary information about the Candidate table and request" + "\n" +
+                "7. Delete keyfile" + "\n" +
                 "8. Exit");
 
 
         Scanner input = new Scanner(System.in);
 
-        int result = input.nextInt();
+        int result = 0;
 
-        return result;
+
+        try
+        {
+            result = input.nextInt();
+        }
+
+        catch (java.util.InputMismatchException e)
+        {
+            //System.out.println("Invalid Input, Try again.");
+        }
+        if ( result > 0 && result <= 8){
+            return result;
+        }
+
+        System.out.println("Invalid Input, Try again.");
+        return 0;
     }
 
     public void chooseOption(int choice) throws IOException {
 
         Scanner input = new Scanner(System.in);
+        // Invalid input
+        if (choice == 0) {
 
+            this.showMenu();
+
+        }
         if (choice == 1) {
 
             this.displayCurrentKeys();
